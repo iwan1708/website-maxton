@@ -1,0 +1,12 @@
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const html = fs.readFileSync('index.html','utf8');
+const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]));
+for(const [,anchor] of html.matchAll(/href="#([^"]+)"/g)) assert(ids.has(anchor),`Missing section ${anchor}`);
+for(const [,asset] of html.matchAll(/(?:src|href)="((?:assets\/|styles\.|app\.)[^"]+)"/g)) assert(fs.existsSync(asset),`Missing asset ${asset}`);
+assert(html.includes('62818471323') && html.includes('6281907167118'));
+assert(html.includes('1 Desember 2026'));
+assert.equal(new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1])).size,[...html.matchAll(/\bid="([^"]+)"/g)].length);
+console.log('Verified navigation targets, assets, event date, contact destinations and unique IDs.');
+console.log('Poster SHA256:',crypto.createHash('sha256').update(fs.readFileSync('assets/balanced-scorecard-workshop.png')).digest('hex'));
